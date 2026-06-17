@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biz-Manger Lite - Productivity Ledger</title>
+    <link rel="stylesheet" href="css/styles.css" >
+    <link rel="stylesheet" href="https://cdnjs.cliudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <header style="background-color: var(--primary-color); color: white; padding: 15px 0;">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>Biz-Manager Lite</h1>
+            <nav>
+                <a href="dashboard.html" style="color: white; margin-left: 15px; text-decoration: none; ">Dashboard</a>
+                <a href="tasks.html" style="color: white; margin-left: 15px; text-decoration: none; ">Tasks</a>
+                <a href="ledger.html" style="color: white; margin-left: 15px; text-decoration: none; font-weight: bold; ">Ledger</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <h2>Productivity & Financial Ledger</h2>
+
+        <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+            <div class="card" style="border-left: 5px solid var(--secondary-color)">
+                <h4 style="color: var(--text-muted);">Total Income</h4>
+                <p id="total-income" style="font-size: 24px; font-weight: bold; color: var(--secondary-color);">$0.00</p>
+            </div>
+
+            <div class="card" style="border-left: 5px solid var(--accent-color);">
+                <h4 style="color: var(--text-muted);">Total Expense</h4>
+                <p id="total-expenses" style="font-size: 24px; font-weight: bold; color: var(--accent-color)">$0.00</p>
+            </div>
+
+            <div class="card" id="balance-card" style="border-left: 5px solid var(--primary-color);">
+                <h4 style="color: var(--text-muted);">Net Balance</h4>
+                <p id="total-icome" style="font-size: 24px; font-weight: bold; ">$0.00</p>
+            </div>
+        </section>
+
+        <section class="card">
+            <h3>Record Transaction</h3>
+            <form id="ledger-form" style="display: flex; gap: 15px; margin-top: 15px; flex-wrap: wrap;">
+                <input type="text" id="ledger-desc" placeholder="Entry description (e.g., Client Downpayment)" required style="flex: 2; padding: 10px; border: 1px solid #D1D5DB; border-radius: 6px;">
+
+                <select id="ledger-type" style="flex: 1; padding: 10px; border: 1px solid #D1D5DB; border-radius: 6px;">
+                   <option value="income">Income (+)</option> 
+                   <option value="expense">Expense (-)</option>
+                </select>
+
+                <input type="number" id="ledger-amount" placeholder="Amount ($)" step="0.01" required style="flex: 1; padding: 10px; border: 1px solid #D1D5DB; border-radius: 6px;" >
+
+                <button type="submit" class="btn btn-secondary"><i class="fa-solid fa-wallet"></i> Log Entry</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h3>Transaction History</h3>
+            <div style="overflow-x: auto; margin-top: 15px;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="background-color: var(--bg-light); border-bottom: 2px solid #E5E7EB;">
+                            <th style="padding: 12px;">Date</th>
+                            <th style="padding: 12px;">Description</th>
+                            <th style="padding: 12px;">Type</th>
+                            <th style="padding: 12px; text-align: right;">Amount</th>
+                        </tr>
+                    </thead> 
+                    <tbody id="ledger-table-body"></tbody>   
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import {LedgerManager} from './js/ledgerManager.js';
+
+        document.addEventListener('DOMContenetLoaded', () => {
+            updateLedgerUI();
+
+            // This handles the transaction recording submit
+            document.getElementById('ledger-form').addEventListener('submit', (e) => {
+               e.preventDefault();
+               const desc = document.getElementById('ledger-desc').value;
+               const type = document.getElementById('ledger-type').value;
+               const amount = document.getElementById('ledger-amount').value;
+               
+               LedgerManager.addTransaction(desc, type, amount);
+               document.getElementById('ledger-form').reset();
+               updateLedgerUI();
+            });
+        });
+
+        function updateLedgerUI() {
+            const summary = LedgerManager.getFinancialSummary();
+            const transactions = LedgerManager.getAllTransactions();
+            const tableBody = document.getElementById('ledger-table-body');
+
+            // Update the balances on summary metric display cards
+            document.getElementById('total-income').innerText = `$${summary.income.toFixed(2)}`;
+            document.getElementById('total-expense').innerText = `$${summary.expense.toFixed(2)}`;
+            document.getElementById('net-balance').innerText = `$${summary.netBalance.toFixed(2)}`;
+
+            // We dynamically alter the net balance color indicators based on profitability
+            const balanceCard = document.getElementById('balance-card');
+            if (summary.netBalance >= 0) {
+                document.getElementById('net-balance').style.color = 'var(--secondary-color)';
+                balanceCard.style.borderLeftColor = 'var(--secondary-color)';
+            } else {
+                document.getElementById('net-balance').style.color = '#EF4444'; // Red alert warning sign
+                balanceCard.style.borderLeftColor = '#EF4444';
+            }
+
+            // We render out the history profiles
+            tableBody.innerHTML = '';
+            if (transactions.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4" style="padding: 15px; text-align: center; color: var(--text-muted);">No recorded transactions found.</td></tr>`;
+                return;
+            }
+
+            // Show newest transactions first
+            [...transactions].reverse().forEach(tx => {
+                const row = document.createElement('tr');
+                row.style.borderBottom = '1px solid var(--bg-light)';
+
+                const typeBadgeColor = tx.type === 'income' ? 'background-color: #D1FAE5; color: #065F46;': 'background-color: #FEE2E2; color: #991B1B; ';
+                const amountPrefix = tx.type === 'income' ? '+' : '-';
+                const amountColor = tx.type === 'income' ? 'color: #10B981;' : 'color: #EF4444;';
+
+                row.innerHTML =`
+                    <td style="padding: 12px; color: var(--text-muted); font-size: 14px;">${tx.date}</td>
+                    <td style="padding: 12px; font-weight: 500;">${tx.description}</td>
+                    <td style="padding: 12px;">
+                        <span style="padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; ${typeBadgeColor}">
+                            ${tx.type}
+                        </span>
+                    </td>
+                    <td style="padding: 12px; text-align: right; font-weight: bold; ${amountColor}">
+                        ${amountPrefix}$${tx.amount.toFixed(2)}
+                    </td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+
+        }
+
+    </script>
+    
+</body>
+</html>

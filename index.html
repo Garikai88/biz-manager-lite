@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biz-Manager Lite - Portal Gateway</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="display: flex; flex-direction: column; min-height: 100vh; background: linear-gradient(135deg, #1E3A8A 0%, #0F172A 100%);">
+
+    <main style="flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 20px;">
+        <div class="card" style="width: 100%; max-width: 420px; text-align: center; padding: 40px 30px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); border: none;">
+            
+            <div style="background-color: #E0E7FF; width: 70px; height: 70px; border-radius: 50%; color: var(--primary-color); font-size: 28px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
+                <i class="fa-solid fa-chart-pie"></i>
+            </div>
+
+            <h2 style="font-size: 24px; margin-bottom: 8px;">Biz-Manager Lite</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 30px;">
+                Smart Workspace Task Engine & Financial Analytics
+            </p>
+
+            <form id="gate-form" style="display: flex; flex-direction: column; gap: 15px; text-align: left;">
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <label for="user-pass" style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted);">Access Token Key</label>
+                    <input type="password" id="user-pass" placeholder="••••••••" value="demo1234" required style="padding: 12px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 14px; width: 100%;">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; margin-top: 10px; font-weight: 600;">
+                    Enter Workspace Portal <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <div style="margin-top: 25px; border-top: 1px solid #F3F4F6; padding-top: 20px;">
+                <p style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                    Built with browser-native ES6 Modules & persistent Client-Side LocalStorage APIs.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 15px; color: rgba(255,255,255,0.6); font-size: 12px; font-weight: 500;">
+        &copy; 2026 Biz-Manager Lite Core Platform Workspace.
+    </footer>
+
+    <script type="module">
+        import { StorageEngine } from './js/storage.js';
+
+        document.getElementById('gate-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Fire up the storage engine data tables arrays
+            StorageEngine.init();
+
+            // Direct route over to the workspace panel grid area
+            window.location.href = 'dashboard.html';
+        });
+    </script>
+</body>
+</html>
