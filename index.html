@@ -46,13 +46,8 @@
     </footer>
 
     <script type="module">
-        import { StorageEngine } from './js/storage.js';
-
         document.getElementById('gate-form').addEventListener('submit', (e) => {
             e.preventDefault();
-            
-            // Fire up the storage engine data tables arrays
-            StorageEngine.init();
 
             // Direct route over to the workspace panel grid area
             window.location.href = 'dashboard.html';
