@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biz-Manager Lite - Tasks</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -45,29 +45,34 @@
     </main>
     
     <script type="module">
-        import { TaskManager } from './js/taskManager.js';
+        // 1. Import your brand new TaskManager Class module definition
+        import TaskManager from '/js/taskManager.js';
 
         document.addEventListener('DOMContentLoaded', () => {
-            renderTasks();
+            // 2. Instantiate the Class to create an active manager controller instance
+            const taskController = new TaskManager();
+
+            // Run initial data render sweep
+            renderTasks(taskController);
 
             // This handles form submission (Create)
             document.getElementById('task-form').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const title = document.getElementById('task-title').value;
-                // Fixed Typo: Corrected prioriy variable name declaration alignment
                 const priority = document.getElementById('task-priority').value;
 
-                // Syncing project defaults directly to your mock 'proj_1' storage bucket
-                TaskManager.addTask(title, 'proj_1', priority);
+                // 3. Call methods directly off your initialized instance controller
+                taskController.addTask(title, 'proj_1', priority);
                 document.getElementById('task-form').reset();
-                renderTasks();
+                renderTasks(taskController);
             });
         });
 
-        function renderTasks() {
+        // Pass the taskController instance down to handle CRUD rendering loops cleanly
+        function renderTasks(taskController) {
             const container = document.getElementById('tasks-container');
             container.innerHTML = '';
-            const tasks = TaskManager.getAllTasks();
+            const tasks = taskController.getAllTasks();
 
             if (tasks.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-muted)">No tasks found. Add one above!</p>';
@@ -85,7 +90,6 @@
 
                 const badgeColor = task.priority === 'High' ? 'var(--accent-color)' : task.priority === 'Medium' ? '#3B82F6' : 'var(--text-muted)';
                 
-                // Fixed ID Spacing Typo: Removed the leading space inside data-id="${task.id}"
                 taskRow.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 15px;">
                         <input type="checkbox" class="toggle-btn" data-id="${task.id}" ${task.completed ? 'checked' : ''} style="transform: scale(1.2); cursor: pointer;">
@@ -99,17 +103,17 @@
                     </button>
                 `;
 
-                // Fixed Feature: Added an Event Listener for status toggles (Update)
+                // Update status change listener via controller instance
                 taskRow.querySelector('.toggle-btn').addEventListener('change', (e) => {
-                    TaskManager.toggleTaskStatus(e.target.dataset.id);
-                    renderTasks();
+                    taskController.toggleTaskStatus(e.target.dataset.id);
+                    renderTasks(taskController);
                 });
 
-                // Event Listener for Deleting (Delete)
+                // Delete click listener via controller instance
                 taskRow.querySelector('.delete-btn').addEventListener('click', (e) => {
                     const button = e.target.closest('.delete-btn');
-                    TaskManager.deleteTask(button.dataset.id);
-                    renderTasks();
+                    taskController.deleteTask(button.dataset.id);
+                    renderTasks(taskController);
                 });
 
                 container.appendChild(taskRow);

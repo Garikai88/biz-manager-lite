@@ -1,45 +1,56 @@
 import { StorageEngine } from './storage.js';
 
-export const LedgerManager = {
-    // This reads : Get all transactions
-    getAllTransactions() {
-        return StorageEngine.getData('LEDGER');
-    },
+export default class LedgerManager {
+    constructor() {
+        this.storageKey = 'LEDGER_LOGS';
+    }
 
-    // wE CREATE: Add income or expense
-    addTransaction(description, type, amount) {
-        const transactions = this.getAllTransactions();
-        const newTransaction = {
-            id: 'tx_' + Date.now(),
+    // READ: Fetch all financial records
+    getAllLogs() {
+        return StorageEngine.getData(this.storageKey) || [];
+    }
+
+    // CREATE: Add an income or expense entry
+    addLog(description, amount, type) {
+        const logs = this.getAllLogs();
+        const newLog = {
+            id: 'log_' + Date.now(),
             description: description,
-            type: type, // income or expense
-            amount: parseFloat(amount) || 0,
-            date: new Date().toISOString().split('T')[0] // This will format as YYYY-MM-DD
+            amount: parseFloat(amount),
+            type: type, // 'income' or 'expense'
+            date: new Date().toLocaleDateString()
         };
 
-        transactions.push(newTransaction);
-        StorageEngine.saveData('LEDGER', transactions);
-        return newTransaction;
-    },
+        logs.push(newLog);
+        StorageEngine.saveData(this.storageKey, logs);
+        return newLog;
+    }
 
-    // We will then CALCULATE: Get financial balance
-    getFinancialSummary() {
-        const transactions = this.getAllTransactions();
+    // DELETE: Remove a record
+    deleteLog(logId) {
+        let logs = this.getAllLogs();
+        logs = logs.filter(log => log.id !== logId);
+        StorageEngine.saveData(this.storageKey, logs);
+    }
+
+    // CALCULATE: Get totals for dashboard metrics
+    getBalanceMetrics() {
+        const logs = this.getAllLogs();
         let totalIncome = 0;
-        let totalExpense = 0;
+        let totalExpenses = 0;
 
-        transactions.forEach(tx => {
-            if (tx.type === 'income') {
-                totalIncome += tx.amount;
-            } else if (tx.type === 'expense') {
-                totalExpense += tx.amount;
+        logs.forEach(log => {
+            if (log.type === 'income') {
+                totalIncome += log.amount;
+            } else if (log.type === 'expense') {
+                totalExpenses += log.amount;
             }
         });
 
         return {
             income: totalIncome,
-            expense: totalExpense,
-            netBalance: totalIncome - totalExpense
+            expenses: totalExpenses,
+            netBalance: totalIncome - totalExpenses
         };
     }
-};
+}

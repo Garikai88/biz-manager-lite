@@ -1,0 +1,26 @@
+{
+  "name": "biz-manager-lite",
+  "version": "1.0.0",
+  "description": "Biz-Manager Lite is a web-based productivity and project management application built for freelancers, software developers, and small remote teams. It unifies project tracking, task sprint management, and basic financial analytics into a single dashboard.",
+  "main": "index.html",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Garikai88/biz-manager-lite.git"
+  },
+  "keywords": [],
+  "author": "Garikai Munamato Mangobe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Garikai88/biz-manager-lite/issues"
+  },
+  "homepage": "https://github.com/Garikai88/biz-manager-lite#readme",
+  "devDependencies": {
+    "vite": "^5.4.21"
+  }
+}

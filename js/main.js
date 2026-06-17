@@ -1,96 +1,57 @@
 // js/main.js
-import { StorageEngine } from './storage.js';
-import { CoinGeckoService } from './services/coingeckoService.js';
-import { TrelloService } from './services/trelloServices.js';
-import { ProjectManager } from './projectManager.js';
-import { LedgerManager } from './ledgerManager.js'; // Make sure this is imported for financial metrics
+import ProjectManager from './projectManager.js';
+import LedgerManager from './ledgerManager.js';
 
-// 1. YOUR DYNAMIC PROJECT RENDERER FUNCTION
-function renderDashboardProjects(projects) {
-    const container = document.getElementById('project-list-container');
-    if (!container) return;
-    container.innerHTML = '';
-
-    if (projects.length === 0) {
-        container.innerHTML = '<p style="color: var(--text-muted);">No active projects listed.</p>';
-        return;
-    }
-
-    projects.forEach(project => {
-        const liveProgress = ProjectManager.calculateProjectProgress(project.id);
-
-        const item = document.createElement('div');
-        item.style.padding = "12px 0";
-        item.style.borderBottom = "1px solid var(--bg-light)";
-        item.innerHTML = `
-            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                <strong>${project.name}</strong>
-                <span style="color: var(--secondary-color); font-weight: 600;">${liveProgress}% Complete</span>
-            </div>
-            <div style="background: var(--bg-light); width: 100%; height: 8px; border-radius: 4px; overflow: hidden;">
-                <div style="background: var(--secondary-color); width: ${liveProgress}%; height: 100%;"></div>
-            </div>
-        `;
-        container.appendChild(item);
-    });
-}
-
-// 2. COUNTER METRICS RENDERER (Updates the top layout badges)
-function updateDashboardSummaryBadges() {
-    const projects = StorageEngine.getData('PROJECTS') || [];
-    const tasks = StorageEngine.getData('TASKS') || [];
-    const financialSummary = LedgerManager.getFinancialSummary();
-
-    // Target elements from your HTML markup structure
-    const totalProjectsEl = document.getElementById('total-projects-badge');
-    const pendingTasksEl = document.getElementById('pending-tasks-badge');
-    const netRevenueEl = document.getElementById('net-revenue-badge');
-
-    // Ingest dynamic lengths and values
-    if (totalProjectsEl) totalProjectsEl.textContent = projects.length;
-    if (pendingTasksEl) {
-        const pendingCount = tasks.filter(t => !t.completed).length;
-        pendingTasksEl.textContent = pendingCount;
-    }
-    if (netRevenueEl) {
-        netRevenueEl.textContent = `$${financialSummary.netBalance.toFixed(2)}`;
-    }
-}
-
-// 3. THIRD-PARTY API WORKSPACE LINK ROUTINES
-async function loadExternalApiIntegrations() {
-    // A. CoinGecko Integration Feed
-    const cryptoPriceEl = document.getElementById('coingecko-rate-display');
-    if (cryptoPriceEl) {
-        const price = await CoinGeckoService.getBitcoinPrice();
-        cryptoPriceEl.innerHTML = `<i class="fa-brands fa-bitcoin" style="color: #F7931A;"></i> BTC/USD: <strong>$${price.toLocaleString()}</strong>`;
-    }
-
-    // B. Trello Metrics Board Feed
-    const trelloStatusEl = document.getElementById('trello-cards-display');
-    if (trelloStatusEl) {
-        // Using a sample public board ID token
-        const samplePublicBoardId = '6091845bb083bc74d080c982'; 
-        const cards = await TrelloService.getBoardCards(samplePublicBoardId);
-        
-        if (cards && cards.length > 0) {
-            trelloStatusEl.innerHTML = `<i class="fa-brands fa-trello" style="color: #0079BF;"></i> Open Sprint Cards: <strong>${cards.length} Active</strong>`;
-        } else {
-            trelloStatusEl.innerHTML = `<i class="fa-brands fa-trello" style="color: var(--text-muted);"></i> Trello Board: <span style="color: var(--text-muted);">Disconnected</span>`;
-        }
-    }
-}
-
-// 4. MAIN CENTRALIZED ENTRY INITIALIZATION ENGINE
 document.addEventListener('DOMContentLoaded', () => {
-    // Ensure data collections are initialized on local client disk storage arrays
-    StorageEngine.init();
+    // Initialize our core object-oriented class layers
+    const projectRepo = new ProjectManager();
+    const financialRepo = new LedgerManager();
 
-    // Fire off UI view generation streams
-    const currentProjects = StorageEngine.getData('PROJECTS') || [];
-    renderDashboardProjects(currentProjects);
-    updateDashboardSummaryBadges();
+    // Pull datasets safely through our class methods
+    const activeProjects = projectRepo.getAllProjects();
+    const financialSummary = financialRepo.getBalanceMetrics();
 
-    // Pull async data over network pipelines
-    loadExternalApiIntegrations();
+    // Inject analytics right into your HTML interface nodes
+    updateDashboardDOM(activeProjects, financialSummary);
 });
+
+function updateDashboardDOM(projects, finances) {
+    // 1. Update Project Counter Metrics
+    const totalProjectsCountNode = document.getElementById('total-projects-count');
+    if (totalProjectsCountNode) {
+        totalProjectsCountNode.innerText = projects.length;
+    }
+
+    // 2. Update Finance Overview Cards
+    const absoluteBalanceNode = document.getElementById('dashboard-net-balance');
+    if (absoluteBalanceNode) {
+        absoluteBalanceNode.innerText = `$${finances.netBalance.toFixed(2)}`;
+        // Highlight green if profitable, red if negative balance
+        absoluteBalanceNode.style.color = finances.netBalance >= 0 ? '#10B981' : '#EF4444';
+    }
+
+    // 3. Render quick-view items into a project layout pipeline
+    const listContainer = document.getElementById('quick-projects-list');
+    if (listContainer) {
+        listContainer.innerHTML = '';
+        if (projects.length === 0) {
+            listContainer.innerHTML = '<p style="color: var(--text-muted)">No active projects running.</p>';
+            return;
+        }
+
+        projects.slice(0, 3).forEach(project => {
+            const element = document.createElement('div');
+            element.style.padding = '8px 0';
+            element.innerHTML = `
+                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                    <span style="font-weight:500;">${project.name}</span>
+                    <span style="color:var(--accent-color); font-weight:600;">${project.progress}%</span>
+                </div>
+                <div style="background:#E5E7EB; height:6px; border-radius:4px; overflow:hidden;">
+                    <div style="background:var(--accent-color); height:100%; width:${project.progress}%"></div>
+                </div>
+            `;
+            listContainer.appendChild(element);
+        });
+    }
+}

@@ -1,45 +1,41 @@
-// js/taskManager.js
 import { StorageEngine } from './storage.js';
 
-export const TaskManager = {
-    // READ: Get all tasks
-    getAllTasks() {
-        return StorageEngine.getData('TASKS');
-    },
+export default class TaskManager {
+    constructor() {
+        this.storageKey = 'TASKS';
+    }
 
-    // CREATE: Add a new task
+    getAllTasks() {
+        return StorageEngine.getData(this.storageKey) || [];
+    }
+
     addTask(title, projectId, priority) {
         const tasks = this.getAllTasks();
         const newTask = {
-            id: 'task_' + Date.now(), // Unique timestamp ID
-            projectId: projectId || 'p1',
+            id: 'task_' + Date.now(),
+            projectId: projectId,
             title: title,
-            priority: priority || 'Medium',
-            completed: false // Kept as 'completed' to line up with our toggle logic
+            priority: priority,
+            completed: false
         };
-
         tasks.push(newTask);
-        StorageEngine.saveData('TASKS', tasks);
+        StorageEngine.saveData(this.storageKey, tasks);
         return newTask;
-    },
+    }
 
-    // UPDATE: Toggle completed status safely
     toggleTaskStatus(taskId) {
         const tasks = this.getAllTasks();
-        const task = tasks.find(t => t.id === taskId); // Fixed 'task.find' to 'tasks.find'
-        
+        const task = tasks.find(t => t.id === taskId);
         if (task) {
-            task.completed = !task.completed; // Fixed property naming consistency
-            StorageEngine.saveData('TASKS', tasks);
+            task.completed = !task.completed;
+            StorageEngine.saveData(this.storageKey, tasks);
         }
-        return task;
-    },
+    }
 
-    // DELETE: Remove a task
     deleteTask(taskId) {
         let tasks = this.getAllTasks();
         tasks = tasks.filter(t => t.id !== taskId);
-        StorageEngine.saveData('TASKS', tasks);
+        StorageEngine.saveData(this.storageKey, tasks);
     }
-};
+}
 
