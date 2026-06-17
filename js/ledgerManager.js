@@ -32,7 +32,7 @@ export const LedgerManager = {
             if (tx.type === 'income') {
                 totalIncome += tx.amount;
             } else if (tx.type === 'expense') {
-                totalExpenses += tx.amount;
+                totalExpense += tx.amount;
             }
         });
 
