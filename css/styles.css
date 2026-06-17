@@ -1,7 +1,10 @@
-@import url('https://fonts.googleapis.com/css2??family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap');
+/* css/styles.css */
+
+/* Fixed: Resolved the duplicate parameter syntax token trap inside the google webfont cdn delivery query */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap');
 
 :root {
-    --primary-color: #1E3A8A; /* Deep Coorporate Navy Blue */
+    --primary-color: #1E3A8A; /* Deep Corporate Navy Blue */
     --secondary-color: #10B981; /* Metric Emerald Green */
     --accent-color: #F97316; /* Sprint Alert Orange */
     --bg-light: #F3F4F6; /* Light Gray Application Workspace Canvas */
@@ -11,7 +14,6 @@
 
     --font-headings: 'Poppins', sans-serif;
     --font-body: 'Inter', sans-serif;
-
 }
 
 * {
@@ -26,7 +28,6 @@ body {
     color: var(--text-main);
     line-height: 1.6;
     padding-bottom: 40px;
-
 }
 
 h1, h2, h3, h4 {
@@ -39,7 +40,6 @@ h1, h2, h3, h4 {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
-
 }
 
 /* Global Modular Header Nav */
@@ -56,12 +56,7 @@ header .container {
     align-items: center;
 }
 
-header h1 {
-    color: white;
-    justify-content: space-between;
-    align-items: center;
-}
-
+/* Fixed: Stripped out the duplicate block placeholder rules */
 header h1 {
     color: white;
     font-size: 24px;
@@ -112,7 +107,6 @@ header nav a:hover, header nav a.active {
 .btn-primary {
     background-color: var(--primary-color);
     color: white;
-
 }
 
 .btn-primary:hover {
