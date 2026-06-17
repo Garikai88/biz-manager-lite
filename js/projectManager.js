@@ -1,9 +1,9 @@
-import {StorageEngine} from './storage.js';
+import { StorageEngine } from './storage.js';
 
 export const ProjectManager = {
     // READ: Get all projects
     getAllProjects() {
-        return StorageEngine.getData('PROJECTS');
+        return StorageEngine.getData('PROJECTS') || [];
     },
 
     // CREATE: Add a new project
@@ -23,13 +23,20 @@ export const ProjectManager = {
     // ANALYTICS: Calculate real progress based on task completion
     calculateProjectProgress(projectId) {
         const allTasks = StorageEngine.getData('TASKS') || [];
-        // We filter tasks belonging to this specific project
-        const projectTasks = allTasks.filter(task => task.completed).length;
+        
+        // 1. Filter tasks belonging to *this specific project* first
+        const projectTasks = allTasks.filter(task => task.projectId === projectId);
+        
+        // Safety guard: If the project has no tasks yet, progress is 0%
+        if (projectTasks.length === 0) return 0;
 
-        // We calculate percentage mathemetically
-        const progressPercentage = Math.round((completedTasks / projectTasks.length) * 100);
+        // 2. Count how many tasks for *this project* are actually completed
+        const completedTasksCount = projectTasks.filter(task => task.completed).length;
 
-        // We then update the project's progress in storage so the dashboard stays accurate
+        // 3. Calculate percentage mathematically using your formula: (Part / Total) * 100
+        const progressPercentage = Math.round((completedTasksCount / projectTasks.length) * 100);
+
+        // 4. Update the project's progress in storage so the dashboard stays accurate
         const projects = this.getAllProjects();
         const project = projects.find(p => p.id === projectId);
         if (project) {
