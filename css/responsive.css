@@ -52,17 +52,39 @@
         margin-bottom: 10px;
         border-radius: 6px;
         background: #FFF;
+        padding: 5px 0;
     }
     
     td {
         border: none;
         border-bottom: 1px solid #F3F4F6;
         position: relative;
-        padding-left: 50% !important;
+        padding-left: 45% !important; /* Left padding room for the generated labels */
         text-align: right !important;
     }
     
     td:last-child {
         border-bottom: none;
     }
+
+    /* * INJECT CONTEXT LABELS VIA PSEUDO-ELEMENTS
+     * Forces standard column context headers into the left margin space of each row block
+     */
+    td::before {
+        position: absolute;
+        left: 12px;
+        width: 40%;
+        text-align: left;
+        font-weight: 600;
+        color: var(--text-muted);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Target cells explicitly by order to match the ledger columns structure */
+    td:nth-of-type(1)::before { content: "Date"; }
+    td:nth-of-type(2)::before { content: "Description"; }
+    td:nth-of-type(3)::before { content: "Type"; }
+    td:nth-of-type(4)::before { content: "Amount"; }
 }

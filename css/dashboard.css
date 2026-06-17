@@ -1,3 +1,5 @@
+/* css/dashboard.css */
+
 /* Main welcome banner section adjustments */
 .welcome-banner {
     margin: 30px 0 25px 0;
@@ -21,9 +23,9 @@
     gap: 20px;
 }
 
-.metric-card-wrapper.projects {border-left: 5px solid var(--primary-color); }
+.metric-card-wrapper.projects { border-left: 5px solid var(--primary-color); }
 .metric-card-wrapper.tasks { border-left: 5px solid var(--accent-color); }
-.metric-card-wrapper.revenue {border-left: 5px solid var(--secondary-color); }
+.metric-card-wrapper.revenue { border-left: 5px solid var(--secondary-color); }
 
 .icon-circle {
     padding: 15px;
@@ -36,9 +38,9 @@
     justify-content: center;
 }
 
-.projects .icon-circle {background-color: #E0E7FF; color: var(--primary-color); }
-.tasks .icon-circle {background-color: #FFEDD5; color: var(--accent-color);}
-.revenue .icon-circle { background-color: #D1FAE5; color: var(--secondary-color);}
+.projects .icon-circle { background-color: #E0E7FF; color: var(--primary-color); }
+.tasks .icon-circle { background-color: #FFEDD5; color: var(--accent-color); }
+.revenue .icon-circle { background-color: #D1FAE5; color: var(--secondary-color); }
 
 .metric-data h4 {
     color: var(--text-muted);
@@ -59,6 +61,7 @@
     grid-template-columns: 2fr 1fr;
     gap: 25px;
     align-items: start;
+    min-height: 350px; /* Restored: Keeps container stable during API async loading */
 }
 
 .panel-header {
@@ -85,4 +88,12 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 6px;
+}
+
+/* Responsive Structural Breakpoint Media Queries */
+@media (max-width: 768px) {
+    .workspace-split {
+        grid-template-columns: 1fr; /* Stacks the project tracker above the integration desk on smaller viewports */
+        gap: 20px;
+    }
 }
