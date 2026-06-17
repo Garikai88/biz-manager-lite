@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Biz-Manager Lite - Tasks</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cliudflare.com/ajax/libs/fon-awesome/6.4.0/all.min.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    
     <header style="background-color: var(--primary-color); color: white; padding: 15px 0;">
         <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
             <h1>Biz-Manager Lite</h1>
@@ -40,11 +40,8 @@
 
         <section class="card">
             <h3>Active Sprint Tasks</h3>
-            <div id="tasks-container" style="margin-top: 15px;">
-            
-            </div>
+            <div id="tasks-container" style="margin-top: 15px;"></div>
         </section>
-
     </main>
     
     <script type="module">
@@ -57,9 +54,11 @@
             document.getElementById('task-form').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const title = document.getElementById('task-title').value;
-                const prioriy = document.getElementById('task-priority').value;
+                // Fixed Typo: Corrected prioriy variable name declaration alignment
+                const priority = document.getElementById('task-priority').value;
 
-                TaskManager.addTask(title, 'p1', priority);
+                // Syncing project defaults directly to your mock 'proj_1' storage bucket
+                TaskManager.addTask(title, 'proj_1', priority);
                 document.getElementById('task-form').reset();
                 renderTasks();
             });
@@ -70,7 +69,7 @@
             container.innerHTML = '';
             const tasks = TaskManager.getAllTasks();
 
-            if(tasks.length === 0) {
+            if (tasks.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-muted)">No tasks found. Add one above!</p>';
                 return;
             }
@@ -84,33 +83,38 @@
                 taskRow.style.borderBottom = '1px solid var(--bg-light)';
                 taskRow.style.backgroundColor = task.completed ? '#F9FAFB' : '#FFFFFF';
 
-                // We then setup colors for priorities safely
                 const badgeColor = task.priority === 'High' ? 'var(--accent-color)' : task.priority === 'Medium' ? '#3B82F6' : 'var(--text-muted)';
                 
+                // Fixed ID Spacing Typo: Removed the leading space inside data-id="${task.id}"
                 taskRow.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 15px;">
-                        <input type="checkbox" class="toggle-btn" data-id=" ${task.id}" ${task.completed ? 'checked' : ''} style="transform: scale(1.2); cursor: pointer;">
+                        <input type="checkbox" class="toggle-btn" data-id="${task.id}" ${task.completed ? 'checked' : ''} style="transform: scale(1.2); cursor: pointer;">
                         <span style="text-decoration: ${task.completed ? 'line-through' : 'none'}; color: ${task.completed ? 'var(--text-muted)' : 'var(--text-main)'}">
                             ${task.title}
-                            </span>
-                            <span style="background: ${badgeColor}; color: white; font-size: 11px; padding: 2px 8px; border-radius: 12px;">${task.priority}</span>
-                        </div>
-                        <button class="delete-btn btn" data-id="${task.id}" style="background: transparent; color: #EF4444; padding: 5px 10px;">
-                            <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                            `;
+                        </span>
+                        <span style="background: ${badgeColor}; color: white; font-size: 11px; padding: 2px 8px; border-radius: 12px; font-weight: 500;">${task.priority}</span>
+                    </div>
+                    <button class="delete-btn btn" data-id="${task.id}" style="background: transparent; color: #EF4444; padding: 5px 10px;">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                `;
 
-                            // We then focus on the Event Listener for Deleting (Delete)
-                            taskRow.querySelector('.delete-btn').addEventListener('click', (e) => {
-                                const button = e.target.closest('.delete-btn');
-                                TaskManager.deleteTask(button.dataset.id);
-                                renderTasks();
-                            });
+                // Fixed Feature: Added an Event Listener for status toggles (Update)
+                taskRow.querySelector('.toggle-btn').addEventListener('change', (e) => {
+                    TaskManager.toggleTaskStatus(e.target.dataset.id);
+                    renderTasks();
+                });
 
-                            container.appendChild(taskRow);
+                // Event Listener for Deleting (Delete)
+                taskRow.querySelector('.delete-btn').addEventListener('click', (e) => {
+                    const button = e.target.closest('.delete-btn');
+                    TaskManager.deleteTask(button.dataset.id);
+                    renderTasks();
+                });
+
+                container.appendChild(taskRow);
             });
         }
-
     </script>
 </body>
 </html>
