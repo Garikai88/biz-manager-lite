@@ -27,7 +27,7 @@ export const ProjectManager = {
         const projectTasks = allTasks.filter(task => task.completed).length;
 
         // We calculate percentage mathemetically
-        const progressPercentage = Math.round((completedTasks / projectTasks.lenght) * 100);
+        const progressPercentage = Math.round((completedTasks / projectTasks.length) * 100);
 
         // We then update the project's progress in storage so the dashboard stays accurate
         const projects = this.getAllProjects();
