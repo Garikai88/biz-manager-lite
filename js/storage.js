@@ -11,7 +11,7 @@ const initialProjects = [
     {id: "proj_3", name: "Portfolio Update", progress: 0}
 ];
 
-const initialTaks = [
+const initialTasks = [
     // Website Redesign Tasks (proj_1) -> 1 complete, 1 pending = 50%
     {id: "task_1", projectId: "proj_1", title: "Design Landing Page UI Wireframes", priority: "High", completed: true },
     {id: "task_2", projectId: "proj_1", title: "Setup Flexbox & Grid Core Structural Layouts", priority: "Medium", completed: false },
